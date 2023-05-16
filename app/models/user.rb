@@ -17,10 +17,17 @@ class User < ApplicationRecord
   def User.new_token
     SecureRandom.urlsafe_base64
   end
-
+  
+  # 永続セッションのために、ユーザをデータベースに記憶する
   def remember
     self.remember_token = User.new_token
     update_attribute(:remember_digest, User.digest(remember_token))
+    remember_digest
+  end
+
+  # セッションハイジャック防止のために、セッショントークンを返す。
+  def session_token
+    remember_digest || remember
   end
 
   def authenticated?(remember_token)
